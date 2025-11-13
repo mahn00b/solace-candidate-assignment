@@ -1,5 +1,7 @@
-import db from "..";
-import { advocates } from "../schema";
+import type {
+  Refinement,
+  SeedingUtils,
+} from '.';
 
 const specialties = [
   "Bipolar",
@@ -30,149 +32,35 @@ const specialties = [
   "Domestic abuse",
 ];
 
-const randomSpecialty = () => {
-  const random1 = Math.floor(Math.random() * 24);
-  const random2 = Math.floor(Math.random() * (24 - random1)) + random1 + 1;
+const degrees = [
+  "MD",
+  "PhD",
+  "MSW"
+]
 
-  return [random1, random2];
-};
 
-const advocateData = [
-  {
-    firstName: "John",
-    lastName: "Doe",
-    city: "New York",
-    degree: "MD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 10,
-    phoneNumber: 5551234567,
-  },
-  {
-    firstName: "Jane",
-    lastName: "Smith",
-    city: "Los Angeles",
-    degree: "PhD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 8,
-    phoneNumber: 5559876543,
-  },
-  {
-    firstName: "Alice",
-    lastName: "Johnson",
-    city: "Chicago",
-    degree: "MSW",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 5,
-    phoneNumber: 5554567890,
-  },
-  {
-    firstName: "Michael",
-    lastName: "Brown",
-    city: "Houston",
-    degree: "MD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 12,
-    phoneNumber: 5556543210,
-  },
-  {
-    firstName: "Emily",
-    lastName: "Davis",
-    city: "Phoenix",
-    degree: "PhD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 7,
-    phoneNumber: 5553210987,
-  },
-  {
-    firstName: "Chris",
-    lastName: "Martinez",
-    city: "Philadelphia",
-    degree: "MSW",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 9,
-    phoneNumber: 5557890123,
-  },
-  {
-    firstName: "Jessica",
-    lastName: "Taylor",
-    city: "San Antonio",
-    degree: "MD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 11,
-    phoneNumber: 5554561234,
-  },
-  {
-    firstName: "David",
-    lastName: "Harris",
-    city: "San Diego",
-    degree: "PhD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 6,
-    phoneNumber: 5557896543,
-  },
-  {
-    firstName: "Laura",
-    lastName: "Clark",
-    city: "Dallas",
-    degree: "MSW",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 4,
-    phoneNumber: 5550123456,
-  },
-  {
-    firstName: "Daniel",
-    lastName: "Lewis",
-    city: "San Jose",
-    degree: "MD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 13,
-    phoneNumber: 5553217654,
-  },
-  {
-    firstName: "Sarah",
-    lastName: "Lee",
-    city: "Austin",
-    degree: "PhD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 10,
-    phoneNumber: 5551238765,
-  },
-  {
-    firstName: "James",
-    lastName: "King",
-    city: "Jacksonville",
-    degree: "MSW",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 5,
-    phoneNumber: 5556540987,
-  },
-  {
-    firstName: "Megan",
-    lastName: "Green",
-    city: "San Francisco",
-    degree: "MD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 14,
-    phoneNumber: 5559873456,
-  },
-  {
-    firstName: "Joshua",
-    lastName: "Walker",
-    city: "Columbus",
-    degree: "PhD",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 9,
-    phoneNumber: 5556781234,
-  },
-  {
-    firstName: "Amanda",
-    lastName: "Hall",
-    city: "Fort Worth",
-    degree: "MSW",
-    specialties: specialties.slice(...randomSpecialty()),
-    yearsOfExperience: 3,
-    phoneNumber: 5559872345,
-  },
-];
+export const getAdvocateRefinements = (func: SeedingUtils): Refinement => {
+  return {
+    count: 300000,
+    columns: {
+      firstName: func.firstName(),
+      lastName: func.lastName(),
+      city: func.city(),
+      degree: func.valuesFromArray({ values: degrees }),
+      specialties: func.default({
+        defaultValue: () => {
+          const numSpecialties = Math.floor(Math.random() * 24) + 1; // 1 to 3 specialties
+          const selectedSpecialties = new Set<string>();
+          while (selectedSpecialties.size < numSpecialties) {
+            const randomIndex = Math.floor(Math.random() * specialties.length);
+            selectedSpecialties.add(specialties[randomIndex]);
+          }
+          return Array.from(selectedSpecialties);
+        }
+      }),
+      yearsOfExperience: func.number({ minValue: 1, maxValue: 30, precision: 1 }),
+      phoneNumber: func.number({ minValue: 1000000000, maxValue: 9999999999, precision: 1 }),
+    }
+  }
 
-export { advocateData };
+}
