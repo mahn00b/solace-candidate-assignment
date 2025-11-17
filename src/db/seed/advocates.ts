@@ -14,7 +14,7 @@ const degrees = [
 const getAdvocateRefinements = (func: SeedingUtils) => {
   return {
     advocates: {
-      count: 10,
+      count: 100000,
       columns: {
         firstName: func.firstName(),
         lastName: func.lastName(),

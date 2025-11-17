@@ -22,6 +22,7 @@ async function main(seeds: [string, SeedingFunction][]) {
     process.exit(1);
   }
 
+  const startTime = performance.now();
   const db = drizzle(process.env.DATABASE_URL || '')
 
   for (const [tableName, seedFunction] of seeds) {
@@ -29,6 +30,12 @@ async function main(seeds: [string, SeedingFunction][]) {
     await seedFunction(db);
     console.log(`✅ Finished seeding ${tableName}`);
   }
+
+  const endTime = performance.now();
+  const durationMs = endTime - startTime;
+  const durationSec = (durationMs / 1000).toFixed(2);
+  
+  console.log(`\n⏱️  Total seeding time: ${durationSec}s (${durationMs.toFixed(0)}ms)`);
 }
 
 main(seed_confs)
