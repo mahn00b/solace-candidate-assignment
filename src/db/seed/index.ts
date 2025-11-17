@@ -1,20 +1,22 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { seed  } from 'drizzle-seed';
-import * as schema from '../schema';
+import { seed as seedAdvocates } from './advocates';
+import { seed as seedSpecializations } from './specializations';
+import { seed as seedAdvocateSpecializations } from './advocate_specializations';
 
-// refinements
-import { getAdvocateRefinements } from './advocates';
 
-type RefinementCallback = Parameters<ReturnType<typeof seed>['refine']>[0]; ;
+type RefinementCallback = Parameters<ReturnType<typeof seed>['refine']>[0];
+export type DB = ReturnType<typeof drizzle>;
 export type SeedingUtils = Parameters<RefinementCallback>[0];
-export type Refinement = ReturnType<RefinementCallback>[keyof ReturnType<RefinementCallback>];
+export type SeedingFunction = (db: DB) => Promise<void>;
 
-
-const refinements: [string, (utils: SeedingUtils) => Refinement][] = [
-  ['advocates', getAdvocateRefinements],
+const seed_confs: [string, SeedingFunction][] = [
+  ["advocates", seedAdvocates],
+  ["specialties", seedSpecializations],
+  ["advocate_specialties", seedAdvocateSpecializations],
 ]
 
-async function main(refinements: [key: string, callback: (utils: SeedingUtils) => Refinement][]) {
+async function main(seeds: [string, SeedingFunction][]) {
   if (!process.env.DATABASE_URL) {
     console.error("❌ DATABASE_URL environment variable is not set.");
     process.exit(1);
@@ -22,13 +24,14 @@ async function main(refinements: [key: string, callback: (utils: SeedingUtils) =
 
   const db = drizzle(process.env.DATABASE_URL || '')
 
-  await seed(db, schema).refine((utils) => (refinements.reduce((acc, [key, callback]) => {
-    acc[key] = callback(utils);
-    return acc;
-  }, {} as Record<string, Refinement>)));
+  for (const [tableName, seedFunction] of seeds) {
+    console.log(`Seeding ${tableName}...`);
+    await seedFunction(db);
+    console.log(`✅ Finished seeding ${tableName}`);
+  }
 }
 
-main(refinements)
+main(seed_confs)
   .then(() => {
     console.log("✅ Seeding completed successfully");
     process.exit(0);

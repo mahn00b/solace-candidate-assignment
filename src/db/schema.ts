@@ -26,7 +26,6 @@ const advocates = pgTable("advocates", {
   index("idx_advocates_degree").on(table.degree),
   index("idx_advocates_years_of_experience").on(table.yearsOfExperience),
   index("idx_advocates_full_name").on(table.firstName, table.lastName),
-  index("indx_advocates_phone_number")
 ]);
 
 const specialties = pgTable("specialties", {
