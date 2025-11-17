@@ -8,5 +8,5 @@ export async function GET() {
     .from(advocates)
     .execute()
 
-  return Response.json({ cities: data });
+  return Response.json({ cities: data.map((row) => row.city) });
 }
