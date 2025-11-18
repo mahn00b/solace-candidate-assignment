@@ -17,10 +17,10 @@ const advocates = pgTable("advocates", {
   city: text("city").notNull(),
   degree: text("degree").notNull(),
   email: text("email").notNull().unique(),
+  background: text("background"),
   yearsOfExperience: integer("years_of_experience").notNull(),
   phoneNumber: bigint("phone_number", { mode: "number" }).notNull(),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
-
 }, (table) => [
   index("idx_advocates_city").on(table.city),
   index("idx_advocates_degree").on(table.degree),

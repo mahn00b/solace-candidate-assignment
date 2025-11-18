@@ -22,6 +22,8 @@ const getAdvocateRefinements = (func: SeedingUtils) => {
         degree: func.valuesFromArray({ values: degrees }),
         yearsOfExperience: func.number({ minValue: 1, maxValue: 30, precision: 1 }),
         phoneNumber: func.number({ minValue: 1000000000, maxValue: 9999999999, precision: 1 }),
+        email: func.email(),
+        background: func.loremIpsum({ sentencesCount: 3 }),
       }
     }
   }
