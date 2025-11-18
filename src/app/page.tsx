@@ -55,7 +55,7 @@ export default function Page() {
     fetcher
   );
 
-  const advocates = advocatesData?.data || [];
+  const advocates = advocatesData?.advocates || [];
 
   // Filter advocates based on client-side filters
   const filteredAdvocates = advocates.filter((advocate: Advocate) => {
