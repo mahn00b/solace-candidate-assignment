@@ -41,7 +41,7 @@ export default function Page() {
 
   // Fetch health concerns
   const { data: healthConcernsData } = useSWR('/api/health-concerns', fetcher);
-  const HEALTH_CONCERNS = healthConcernsData?.data || [];
+  const HEALTH_CONCERNS = healthConcernsData?.concerns || [];
 
   // Fetch advocates only when both city and health concerns are selected
   const shouldFetchAdvocates = selectedCity && selectedConcerns.length > 0 && step === 3;
