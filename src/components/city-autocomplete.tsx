@@ -33,7 +33,7 @@ export function CityAutocomplete({ value, onChange }: CityAutocompleteProps) {
       setFiltered([]);
       setOpen(false);
     }
-  }, [value]);
+  }, [value, US_CITIES]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -63,18 +63,22 @@ export function CityAutocomplete({ value, onChange }: CityAutocompleteProps) {
       />
 
       {open && filtered.length > 0 && (
-        <Card className="absolute top-full left-0 right-0 mt-2 border-0 shadow-lg z-50 p-0 max-h-64 overflow-y-auto">
-          {filtered.map((city) => (
-            <button
-              key={city}
-              onClick={() => handleSelect(city)}
-              className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-2 text-gray-900"
-            >
-              <MapPin size={16} className="text-blue-500 flex-shrink-0" />
-              {city}
-            </button>
-          ))}
-        </Card>
+        <div role="listbox">
+          <Card className="absolute top-full left-0 right-0 mt-2 border-0 shadow-lg z-50 p-0 max-h-64 overflow-y-auto">
+            {filtered.map((city) => (
+              <button
+                key={city}
+                role="option"
+                aria-selected={value === city}
+                onClick={() => handleSelect(city)}
+                className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-2 text-gray-900"
+              >
+                <MapPin size={16} className="text-blue-500 flex-shrink-0" />
+                {city}
+              </button>
+            ))}
+          </Card>
+        </div>
       )}
 
       {open && value && filtered.length === 0 && (
