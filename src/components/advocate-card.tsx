@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Card, Button, Badge, Loader } from '@/components/ui';
+import { Card, Button, Badge } from '@/components/ui';
 import { MapPin, Clock, Award } from 'lucide-react';
 import { AdvocateResult } from '@/app/types';
 
