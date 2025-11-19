@@ -74,7 +74,7 @@ export async function GET(request: Request) {
         yearsOfExperience: row.advocates.yearsOfExperience,
         phoneNumber: row.advocates.phoneNumber,
         email: row.advocates.email,
-        background: row.advocates.background, // You can add background if needed
+        background: row.advocates.background,
         specialties: [],
       } as AdvocateResult;
     }
