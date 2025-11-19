@@ -14,7 +14,7 @@ export const AdvocateCard = memo(function AdvocateCard({ advocate, onSelect }: A
       onClick={() => onSelect(advocate)}
       className="p-6 relative cursor-pointer hover:shadow-lg transition-shadow border-0"
     >
-      <h3 className="text-xl font-bold text-gray-900 mb-3">{advocate.firstName}&nbsp;{advocate.lastName}</h3>
+      <h3 className="text-xl font-bold text-gray-900 mb-3">{advocate.firstName} {advocate.lastName}</h3>
 
       <div className="space-y-2 mb-4 text-sm text-gray-600">
         <div className="flex items-center gap-2">
