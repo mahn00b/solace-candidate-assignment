@@ -1,14 +1,10 @@
+import db from "@/db";
+import { specialties } from "@/db/schema";
+
 export async function GET() {
-  const concerns = [
-    'Mental Health',
-    'Chronic Pain',
-    'Diabetes',
-    'Heart Disease',
-    'Cancer Support',
-    'Anxiety',
-    'Depression',
-    'Arthritis',
-  ];
+  const concerns = await db.select()
+    .from(specialties)
+    .execute();
 
   return Response.json({ concerns });
 }
