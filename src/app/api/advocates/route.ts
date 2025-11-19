@@ -60,7 +60,7 @@ export async function GET(request: Request) {
     .execute();
 
   const result = data.reduce((
-    acc: any,
+    acc: Record<string, AdvocateResult>,
     row: (typeof data)[number]
   ) => {
     const advocateId = row.advocates.id.toString();
