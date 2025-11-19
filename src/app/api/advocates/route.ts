@@ -84,17 +84,5 @@ export async function GET(request: Request) {
     return acc;
   }, {} as Record<string, AdvocateResult>);
 
-  // const subquery = db
-  //   .select()
-  //   .from(advocate_specialties)
-  //   .where(inArray(advocate_specialties.name, healthConcernsArray)))
-  // const result = await db.select()
-  //   .from(advocates)
-  //   .where(eq(advocates.city, city))
-  //   .leftJoin(
-  //     advocate_specialties,
-  //     eq(advocate_specialties.advocateId, advocates.id)
-
-  //   )
   return Response.json({ advocates: Array.from(Object.values(result)) });
 }
