@@ -55,10 +55,10 @@ Once the database is running, run the migrations to set up the schema and seed i
 
 ```bash
 # Run migrations
-npm run migrate:up
+npm run db:push
 
 # Seed the database with mock data
-npm run seed
+npm run db:seed
 ```
 
 ### 5. Run the Application
