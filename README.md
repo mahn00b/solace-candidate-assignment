@@ -55,10 +55,10 @@ Once the database is running, run the migrations to set up the schema and seed i
 
 ```bash
 # Run migrations
-npm run migrate:up
+npm run db:push
 
 # Seed the database with mock data
-npm run seed
+npm run db:seed
 ```
 
 ### 5. Run the Application
@@ -77,10 +77,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `npm run build`: Builds the application for production.
 - `npm run start`: Starts the production server.
 - `npm run lint`: Runs ESLint.
-- `npm run generate`: Generates Drizzle migration files based on schema changes.
-- `npm run migrate:up`: Applies pending migrations to the database.
-- `npm run seed`: Populates the database with initial mock data.
-- `npm run reset`: Resets the database (clears data and re-seeds).
+- `npm run db:gen`: Generates Drizzle migration files based on schema changes.
+- `npm run db:push`: Applies pending migrations to the database.
+- `npm run db:seed`: Populates the database with initial mock data.
+- `npm run db:reset`: Resets the database (clears data and re-seeds).
 
 ## Project Structure
 
