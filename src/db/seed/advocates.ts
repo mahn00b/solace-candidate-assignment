@@ -11,6 +11,19 @@ const degrees = [
   "MSW"
 ]
 
+const cities = [
+  "New York",
+  "Los Angeles",
+  "Chicago",
+  "Houston",
+  "Phoenix",
+  "Philadelphia",
+  "San Antonio",
+  "San Diego",
+  "Dallas",
+  "San Jose"
+]
+
 const getAdvocateRefinements = (func: SeedingUtils) => {
   return {
     advocates: {
@@ -18,10 +31,12 @@ const getAdvocateRefinements = (func: SeedingUtils) => {
       columns: {
         firstName: func.firstName(),
         lastName: func.lastName(),
-        city: func.city(),
+        city: func.valuesFromArray({ values: cities }),
         degree: func.valuesFromArray({ values: degrees }),
         yearsOfExperience: func.number({ minValue: 1, maxValue: 30, precision: 1 }),
         phoneNumber: func.number({ minValue: 1000000000, maxValue: 9999999999, precision: 1 }),
+        email: func.email(),
+        background: func.loremIpsum({ sentencesCount: 3 }),
       }
     }
   }

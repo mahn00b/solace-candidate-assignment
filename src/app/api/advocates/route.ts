@@ -1,103 +1,88 @@
+import { and, eq, inArray, ilike, or } from 'drizzle-orm';
+import db from '@/db';
+import { advocate_specialties, advocates, specialties } from '@/db/schema';
+import { AdvocateResult } from '@/app/types';
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q')?.toLowerCase() || '';
   const healthConcernsParam = searchParams.get('healthConcerns') || '';
   const city = searchParams.get('city') || '';
 
-  const advocates = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      city: 'New York, NY',
-      experience: 8,
-      education: 'MSW',
-      specializations: ['Mental Health', 'Anxiety', 'Depression'],
-      phone: '(555) 123-4567',
-      email: 'sarah.johnson@advocates.com',
-      background: 'Sarah is a licensed clinical social worker with 8 years of experience in mental health advocacy. She specializes in helping patients navigate anxiety and depression treatment options.',
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      city: 'San Francisco, CA',
-      experience: 12,
-      education: 'MD',
-      specializations: ['Chronic Pain', 'Heart Disease', 'Diabetes'],
-      phone: '(555) 234-5678',
-      email: 'michael.chen@advocates.com',
-      background: 'Dr. Chen is a board-certified internal medicine physician with over 12 years of patient advocacy experience. He helps patients with complex medical conditions coordinate their care.',
-    },
-    {
-      id: 3,
-      name: 'Emma Rodriguez',
-      city: 'Austin, TX',
-      experience: 6,
-      education: 'BSc',
-      specializations: ['Cancer Support', 'Mental Health'],
-      phone: '(555) 345-6789',
-      email: 'emma.rodriguez@advocates.com',
-      background: 'Emma is a compassionate cancer support advocate who has helped dozens of patients and families navigate treatment decisions and emotional challenges.',
-    },
-    {
-      id: 4,
-      name: 'James Williams',
-      city: 'Boston, MA',
-      experience: 10,
-      education: 'MSW',
-      specializations: ['Arthritis', 'Chronic Pain', 'Mental Health'],
-      phone: '(555) 456-7890',
-      email: 'james.williams@advocates.com',
-      background: 'James combines his background in social work with personal experience managing chronic conditions to provide empathetic, informed advocacy.',
-    },
-    {
-      id: 5,
-      name: 'Lisa Park',
-      city: 'Seattle, WA',
-      experience: 9,
-      education: 'MD',
-      specializations: ['Heart Disease', 'Diabetes'],
-      phone: '(555) 567-8901',
-      email: 'lisa.park@advocates.com',
-      background: 'Dr. Park specializes in cardiovascular and endocrine advocacy, helping patients understand complex treatment options and lifestyle modifications.',
-    },
-    {
-      id: 6,
-      name: 'David Thompson',
-      city: 'Denver, CO',
-      experience: 7,
-      education: 'BSc',
-      specializations: ['Mental Health', 'Anxiety', 'Depression'],
-      phone: '(555) 678-9012',
-      email: 'david.thompson@advocates.com',
-      background: 'David is a wellness advocate with a passion for mental health support and helping patients build resilience.',
-    },
-  ];
+  const healthConcernsArray = healthConcernsParam ? healthConcernsParam.split(',').map(c => c.trim()) : [];
 
-  const healthConcernsArray = healthConcernsParam ? healthConcernsParam.split(',') : [];
-  
-  let filtered = advocates.filter((advocate) => {
-    // Filter by city if provided
-    if (city && !advocate.city.toLowerCase().includes(city.toLowerCase())) {
-      return false;
-    }
-    
-    // Filter by health concerns if provided - must match at least one specialization
-    if (healthConcernsArray.length > 0) {
-      const hasMatchingConcern = healthConcernsArray.some((concern) =>
-        advocate.specializations.some((spec) =>
-          spec.toLowerCase().includes(concern.toLowerCase())
+  // Build filters conditionally
+  const filters = [];
+
+  // City filter (case-insensitive partial match)
+  if (city) {
+    filters.push(ilike(advocates.city, `%${city}%`));
+  }
+
+  // Health concerns filter (at least one matching specialty)
+  if (healthConcernsArray.length > 0) {
+    filters.push(inArray(specialties.name, healthConcernsArray));
+  }
+
+  // Name filter (search in first name or last name)
+  if (query) {
+    const nameParts = query.split(' ').filter(part => part.length > 0);
+    if (nameParts.length > 0) {
+      const nameFilters = nameParts.map(part =>
+        or(
+          ilike(advocates.firstName, `%${part}%`),
+          ilike(advocates.lastName, `%${part}%`)
         )
       );
-      if (!hasMatchingConcern) return false;
+      filters.push(and(...nameFilters));
     }
-    
-    // Filter by name search if provided
-    if (query && !advocate.name.toLowerCase().includes(query)) {
-      return false;
-    }
-    
-    return true;
-  });
+  }
 
-  return Response.json({ advocates: filtered });
+  const data = await db
+    .select({
+      advocates: {
+          id: advocates.id,
+          firstName: advocates.firstName,
+          lastName: advocates.lastName,
+          city: advocates.city,
+          degree: advocates.degree,
+          yearsOfExperience: advocates.yearsOfExperience,
+          phoneNumber: advocates.phoneNumber,
+          background: advocates.background,
+          email: advocates.email,
+        },
+        specialties: specialties.name,
+      })
+    .from(advocates)
+    .innerJoin(advocate_specialties, eq(advocate_specialties.advocateId, advocates.id))
+    .innerJoin(specialties, eq(advocate_specialties.specialtyId, specialties.id))
+    .where(filters.length > 0 ? and(...filters) : undefined)
+    .execute();
+
+  const result = data.reduce((
+    acc: Record<string, AdvocateResult>,
+    row: (typeof data)[number]
+  ) => {
+    const advocateId = row.advocates.id.toString();
+    if (!acc[advocateId]) {
+      acc[advocateId] = {
+        id: row.advocates.id,
+        firstName: row.advocates.firstName,
+        lastName: row.advocates.lastName,
+        city: row.advocates.city,
+        degree: row.advocates.degree,
+        yearsOfExperience: row.advocates.yearsOfExperience,
+        phoneNumber: row.advocates.phoneNumber,
+        email: row.advocates.email,
+        background: row.advocates.background,
+        specialties: [],
+      } as AdvocateResult;
+    }
+
+    acc[advocateId].specialties.push(row.specialties);
+
+    return acc;
+  }, {} as Record<string, AdvocateResult>);
+
+  return Response.json({ advocates: Array.from(Object.values(result)) });
 }

@@ -5,6 +5,7 @@ import useSWR from 'swr';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { MapPin } from 'lucide-react';
+import debounce from 'lodash.debounce';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -14,7 +15,11 @@ interface CityAutocompleteProps {
 }
 
 export function CityAutocomplete({ value, onChange }: CityAutocompleteProps) {
-  const { data: citiesData } = useSWR('/api/cities', fetcher);
+  const { data: citiesData } = useSWR('/api/cities', fetcher, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
   const US_CITIES = citiesData?.cities || [];
 
   const [open, setOpen] = useState(false);
@@ -22,7 +27,7 @@ export function CityAutocomplete({ value, onChange }: CityAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const debouncedFilter = debounce((value: string) => {
     if (value) {
       const results = US_CITIES.filter((city: string) =>
         city.toLowerCase().includes(value.toLowerCase())
@@ -33,6 +38,10 @@ export function CityAutocomplete({ value, onChange }: CityAutocompleteProps) {
       setFiltered([]);
       setOpen(false);
     }
+  }, 300);
+
+  useEffect(() => {
+    debouncedFilter(value);
   }, [value, US_CITIES]);
 
   useEffect(() => {
@@ -71,7 +80,7 @@ export function CityAutocomplete({ value, onChange }: CityAutocompleteProps) {
                 role="option"
                 aria-selected={value === city}
                 onClick={() => handleSelect(city)}
-                className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-2 text-gray-900"
+                className="pointer w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0 flex items-center gap-2 text-gray-900 bg-white"
               >
                 <MapPin size={16} className="text-blue-500 flex-shrink-0" />
                 {city}
