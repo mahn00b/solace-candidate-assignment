@@ -46,7 +46,11 @@ export function SimpleDialog({ open, onClose, children, className }: SimpleDialo
       />
 
       {/* Dialog */}
-      <div className="fixed inset-0 overflow-y-auto">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="fixed inset-0 overflow-y-auto"
+        >
         <div className="flex min-h-full items-center justify-center p-4">
           <div
             className={cn(

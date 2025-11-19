@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Badge, Input, Loader, SimpleDialog, SimpleDialogHeader, SimpleDialogTitle } from '@/components/ui';
 import { AdvocateCard } from '@/components/advocate-card';
-import { Search, MapPin, Clock, Award } from 'lucide-react';
+import { Search } from 'lucide-react';
 import CityAutocomplete from '@/components/city-autocomplete';
 import { HealthConcern, AdvocateResult } from './types';
 

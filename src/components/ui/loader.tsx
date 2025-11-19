@@ -21,10 +21,14 @@ const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(
 
     return (
       <div
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
         ref={ref}
         className={cn("flex items-center justify-center", gapClasses[size], className)}
         {...props}
       >
+        <span className="sr-only">Loading...</span>
         <div
           className={cn(
             "rounded-full bg-current animate-bounce",
